@@ -57,7 +57,7 @@ get_dns_name()
 start()
 {
   start_log=$(
-    start_vm 10.2.1.41 associate-public-ip-address ${USER_NAME}-vm1 file://<( initial_command )
+    start_vm 10.2.1.40 associate-public-ip-address ${USER_NAME}-vm1 file://<( initial_command )
   )
 
   instance_id=$(echo "${start_log}" | jq -r .Instances[0].InstanceId)
