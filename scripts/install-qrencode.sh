@@ -1,7 +1,7 @@
 sudo apt-get update -y
 sudo apt-get install -y nginx git-core qrencode python-virtualenv
 
-git clone https://github.com/sl-2018-12/aws
+git clone https://github.com/VladislavSemko/AWS
 sudo cp aws/config/qrencode.conf /etc/nginx/sites-available/default
 
 git clone https://github.com/chubin/qrenco.de
