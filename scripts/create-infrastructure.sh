@@ -1,22 +1,33 @@
 #!/bin/bash
-IMAGE_ID=ami-02fc24d56bc5f3d67
-#ami-09693313102a30b2c
+
+USER_NAME=user10
+IMAGE_ID=ami-02fc24d56bc5f3d67 # ami-09693313102a30b2c
 INSTANCE_TYPE=t2.micro
 VPC_ID=vpc-04540e242cdfb35de
 KEY_NAME=user4
-USER_NAME=user4
 SUBNET_ID=subnet-0d00d8b5d01e66e35
 SHUTDOWN_TYPE=stop
-SECURITY_GROUP=sg-0eddf9e00104cd1b4
-TAGS="ResourceType=instance,Tags=[{Key=installation_id,Value=${USER_NAME}-vm1},{Key=Name,Value=NAME}]"
+TAGS="ResourceType=instance,Tags=[{Key=installation_id,Value=${USER_NAME}-1},{Key=Name,Value=NAME}]"
+
+initial_command()
+{
+  cat <<EOF
+#!/bin/sh
+
+curl https://raw.githubusercontent.com/VladislavSemko/AWS/master/scripts/install-qrencode.sh | bash -s
+EOF
+
+}
 
 start_vm()
 {
   local private_ip_address="$1"
   local public_ip="$2"
   local name="$3"
+  local user_data="$4"
 
   local tags=$(echo $TAGS | sed s/NAME/$name/)
+  # local tags=${TAGS/NAME/$name}
 
   aws ec2 run-instances \
     --image-id "$IMAGE_ID" \
@@ -26,9 +37,13 @@ start_vm()
     --instance-initiated-shutdown-behavior "$SHUTDOWN_TYPE" \
     --private-ip-address "$private_ip_address" \
     --tag-specifications "$tags" \
-    --${public_ip} \
-    --security-groups "$SECURITY_GROUP" \
-   | jq -r .Instances[0].InstanceId
+    --user-data "$user_data" \
+    --${public_ip}
+
+  # --security-groups "$security_group" \
+
+  #  [--block-device-mappings <value>]
+  #  [--placement <value>]
 }
 
 get_dns_name()
@@ -42,17 +57,18 @@ get_dns_name()
 start()
 {
   start_log=$(
-    start_vm 10.2.1.40 associate-public-ip-address ${USER_NAME}-vm1
+    start_vm 10.2.1.40 associate-public-ip-address ${USER_NAME}-vm1 file://<( initial_command )
   )
 
   instance_id=$(echo "${start_log}" | jq -r .Instances[0].InstanceId)
 
- # for i in {2..3}; do
- #   start_vm 10.2.1.$((40+i)) no-associate-public-ip-address ${USER_NAME}-vm$i > /dev/null
- # done
+  # for i in {2..3}; do
+  #   start_vm 10.2.1.$((100+i)) no-associate-public-ip-address ${USER_NAME}-vm$i > /dev/null
+  # done
 
   sleep 2
   dns_name=$(get_dns_name "$instance_id")
+  echo $dns_name
 }
 
 stop()
@@ -75,4 +91,5 @@ Usage:
 
   $0 start|stop
 EOF
+  exit 1
 fi
