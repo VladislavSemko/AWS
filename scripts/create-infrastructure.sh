@@ -1,6 +1,6 @@
 #!/bin/bash
 
-USER_NAME=user10
+USER_NAME=user4
 IMAGE_ID=ami-02fc24d56bc5f3d67 # ami-09693313102a30b2c
 INSTANCE_TYPE=t2.micro
 VPC_ID=vpc-04540e242cdfb35de
@@ -57,7 +57,7 @@ get_dns_name()
 start()
 {
   start_log=$(
-    start_vm 10.2.1.40 associate-public-ip-address ${USER_NAME}-vm1 file://<( initial_command )
+    start_vm 10.2.1.41 associate-public-ip-address ${USER_NAME}-vm1 file://<( initial_command )
   )
 
   instance_id=$(echo "${start_log}" | jq -r .Instances[0].InstanceId)
