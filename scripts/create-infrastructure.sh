@@ -7,6 +7,7 @@ KEY_NAME=user4
 USER_NAME=user4
 SUBNET_ID=subnet-0d00d8b5d01e66e35
 SHUTDOWN_TYPE=stop
+SECURITY_GROUP=sg-0eddf9e00104cd1b4
 TAGS="ResourceType=instance,Tags=[{Key=installation_id,Value=${USER_NAME}-vm1},{Key=Name,Value=NAME}]"
 
 start_vm()
@@ -26,6 +27,7 @@ start_vm()
     --private-ip-address "$private_ip_address" \
     --tag-specifications "$tags" \
     --${public_ip} \
+    --security-groups "$SECURITY_GROUP" \
    | jq -r .Instances[0].InstanceId
 }
 
